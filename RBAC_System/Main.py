@@ -49,12 +49,12 @@ def menuEdit(archive):
     option = input("Select an option: ")
     match option:
         case "1":
-            contend = input("enter the contend: ")
+            contend = input("Enter the contend: ")
             with open(archive, "w") as file:
                 file.write(contend)
-            print("successfully overwritten!")
+            print("Successfully overwritten!")
         case "2":
-            contend = input("enter the contend: ")
+            contend = input("Enter the contend: ")
             with open(archive , "r") as file:
                 file_contend = file.read()
                 file_contend += contend
@@ -65,7 +65,7 @@ def menuEdit(archive):
 def menu():
     while True:
         print("-"*20)
-        print("Menu")
+        print("MENU")
         print("-" * 20)
         print("1 - Create a user")
         print("2 - Change permission")
@@ -100,7 +100,7 @@ def menu():
                         print(file.read())
                         menuEdit(file_name)
                     else:
-                        print("file not exist!")
+                        print("File not exist!")
                         break
             case "7":
                 pass
