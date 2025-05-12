@@ -1,6 +1,5 @@
 import sqlite3
 from hashlib import sha256
-from re import Match
 
 conn = sqlite3.connect("db_rbac.db")
 cursor = conn.cursor()
@@ -41,47 +40,74 @@ def cadNewUser():
     conn.commit()
     print("Registered!")
 
-def menuAdmin():
+def menuEdit(archive):
+    print("-" * 20)
+    print("MENU EDIT")
+    print("-" * 20)
+    print("1 - Overwrite the file ")
+    print("2 - Add the end of the text")
+    option = input("Select an option: ")
+    match option:
+        case "1":
+            contend = input("enter the contend: ")
+            with open(archive, "w") as file:
+                file.write(contend)
+            print("successfully overwritten!")
+        case "2":
+            contend = input("enter the contend: ")
+            with open(archive , "r") as file:
+                file_contend = file.read()
+                file_contend += contend
+            with open(archive, "w") as filerec:
+                filerec.write(file_contend)
+    print("Successfully edit!")
+
+def menu():
     while True:
         print("-"*20)
         print("Menu")
         print("-" * 20)
-        print("1- Create a user")
+        print("1 - Create a user")
         print("2 - Change permission")
         print("3 - Remove permission ")
         print("4 - Delete user ")
         print("5 - Create a file")
         print("6 - Edit a file ")
         print("7 - Read a file")
+        print("0 - Exit")
         print("-" * 20)
-        option = input("Select an option")
+        option = input("Select an option: ")
         match option :
-            case 1:
+            case "1":
                 cadNewUser()
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
+            case "2":
+                pass
+            case "3":
+                pass
+            case "4":
+                pass
+            case "5":
+                contend = input("Type name of file: ")
+                contend += ".txt"
+                with open(contend, "w") as file:
+                    contend = input("Write the contents of the file: ")
+                    file.write(contend)
+                    print("Successfully created!")
+            case "6":
+                file_name = input("Type name of file for edit: ")
+                with open(file_name, "r") as file:
+                    if file.read():
+                        print(file.read())
+                        menuEdit(file_name)
+                    else:
+                        print("file not exist!")
+                        break
+            case "7":
+                pass
+            case "0":
+                break
 
-
-def menuAuthor():
-    while True:
-        print("-" * 20)
-        print("Select an option")
-        print("-" * 20)
-        print("1 - Create a file")
-        print("2 - Edit a file ")
-        print("3 - Read a file")
-
-def menuGuest():
-    print("-" * 20)
-    print("Select an option")
-    print("-" * 20)
-    print("1 - Read a file")
-
-signup()
+menu()
 
 conn.close()
 quit()
