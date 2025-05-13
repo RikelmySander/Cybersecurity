@@ -22,7 +22,7 @@ def signup():
                 break
         else:
             print("User not exist!")
-            answer = input("Want to create a new user?? (y/n) ")
+            answer = input("You want to create a new user?? (y/n) ")
             if answer.upper() == "Y" or "YES":
                 cadNewUser()
             break
@@ -30,10 +30,10 @@ def signup():
     return login
 
 def cadNewUser():
-    cpf = input("CPF:")
-    name = input("Name:")
-    login = input("Login")
-    password = input("Password")
+    cpf = input("CPF: ")
+    name = input("Name: ")
+    login = input("Login: ")
+    password = input("Password: ")
     idrole = int(input("ID role: "))
     password = sha256(password.encode('utf-8')).hexdigest()
     conn.execute("INSERT INTO user VALUES (?,?,?,?,?)", (cpf,name,login,password,idrole))
@@ -41,45 +41,48 @@ def cadNewUser():
     print("Registered!")
 
 def changePermission():
-    user = input("Type a CPF of the user that you want change a permission: ")
-    cursor.execute("SELECT cpf,name,idrole from user where cpf = ?", (user,))
+    cpfUser = input("Type a CPF of the user that you want change a permission: ")
+    cursor.execute("SELECT cpf,name,idrole FROM user WHERE cpf = ?", (cpfUser,))
     username = cursor.fetchone()
     conn.commit()
-    print(f"You want alter a permission of the user {username[1]} with permission {username[2]} ys?")
-    option = input("Select a option: ")
+    option = input(f"You want alter a permission of the user {username[1]} who has permission {username[2]} y/s?")
     if option.upper() == "Y" or "YES":
-        print("Type 1 for admin, 2 for Author and 3 for Reading")
+        print("Enter 1 for Administrator, 2 for Author and 3 for Reader")
         role = input("Select a option: ")
-        cursor.execute("UPDATE user SET idrole = ? WHERE cpf = ?", (role, username[0]))
-        conn.commit()
-        print("Successefully changed!")
-    else:
-        print("Operation canceleted!")
+        if role == "1" or "2" or  "3":
+            cursor.execute("UPDATE user SET idrole = ? WHERE cpf = ?", (role, username[0]))
+            conn.commit()
+            print("Successfully changed!")
+        else:
+            print("You must have entered the wrong number!")
+            print("Operation canceled!")
 
 def removePermission():
-    user = input("Type a CPF of the user that you want delete: ")
-    cursor.execute("SELECT cpf,name from user where cpf = ?", (user,))
+    cpf_user = input("Type a CPF of the user that you want remove permission: ")
+    cursor.execute("SELECT cpf,name,idrole FROM user WHERE cpf = ?", (cpf_user,))
     username = cursor.fetchone()
     conn.commit()
-    option = input(f"You want delete a user {username[1]} ys")
+    option = input(f"You want to remove a permission from user {username[1]} who has the permission {username[2]}? (the default permission will be set to 3 - Reader) y/n: ")
     if option.upper() == "Y" or "YES":
-        cursor.execute("DELETE cpf,name from user where cpf = ?", (user,))
+        cursor.execute("UPDATE user SET idrole = ? WHERE cpf = ?", ("3",cpf_user))
         conn.commit()
+        print("Successfully Removed!")
     else:
-        print("Operation canceleted!")
+        print("You must have entered the wrong number!")
+        print("Operation canceled!")
 
 def deleteUser():
-    user = input("Type a CPF of the user that you want delete: ")
-    cursor.execute("SELECT cpf,name from user where cpf = ?", (user,))
+    user = input("Enter the CPF of the user you want to delete: ")
+    cursor.execute("SELECT cpf,name FROM user WHERE cpf = ?", (user,))
     username = cursor.fetchone()
     conn.commit()
     option = input(f"You want delete a user {username[1]} ys")
     if option.upper() == "Y" or "YES":
-        cursor.execute("DELETE cpf,name from user where cpf = ?", (user,))
+        cursor.execute("DELETE FROM user WHERE cpf = ?", (username[0],))
         conn.commit()
-        print("Successefully deletes!")
+        print("Successfully deleted!")
     else:
-        print("Operation canceleted!")
+        print("Operation canceled!")
 
 def menuEdit(archive):
     print("-" * 20)
@@ -124,7 +127,7 @@ def menu():
             case "2":
                 changePermission()
             case "3":
-                pass
+                removePermission()
             case "4":
                 deleteUser()
             case "5":
