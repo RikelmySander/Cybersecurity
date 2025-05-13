@@ -40,6 +40,47 @@ def cadNewUser():
     conn.commit()
     print("Registered!")
 
+def changePermission():
+    user = input("Type a CPF of the user that you want change a permission: ")
+    cursor.execute("SELECT cpf,name,idrole from user where cpf = ?", (user,))
+    username = cursor.fetchone()
+    conn.commit()
+    print(f"You want alter a permission of the user {username[1]} with permission {username[2]} ys?")
+    option = input("Select a option: ")
+    if option.upper() == "Y" or "YES":
+        print("Type 1 for admin, 2 for Author and 3 for Reading")
+        role = input("Select a option: ")
+        cursor.execute("UPDATE user SET idrole = ? WHERE cpf = ?", (role, username[0]))
+        conn.commit()
+        print("Successefully changed!")
+    else:
+        print("Operation canceleted!")
+
+def removePermission():
+    user = input("Type a CPF of the user that you want delete: ")
+    cursor.execute("SELECT cpf,name from user where cpf = ?", (user,))
+    username = cursor.fetchone()
+    conn.commit()
+    option = input(f"You want delete a user {username[1]} ys")
+    if option.upper() == "Y" or "YES":
+        cursor.execute("DELETE cpf,name from user where cpf = ?", (user,))
+        conn.commit()
+    else:
+        print("Operation canceleted!")
+
+def deleteUser():
+    user = input("Type a CPF of the user that you want delete: ")
+    cursor.execute("SELECT cpf,name from user where cpf = ?", (user,))
+    username = cursor.fetchone()
+    conn.commit()
+    option = input(f"You want delete a user {username[1]} ys")
+    if option.upper() == "Y" or "YES":
+        cursor.execute("DELETE cpf,name from user where cpf = ?", (user,))
+        conn.commit()
+        print("Successefully deletes!")
+    else:
+        print("Operation canceleted!")
+
 def menuEdit(archive):
     print("-" * 20)
     print("MENU EDIT")
@@ -57,9 +98,9 @@ def menuEdit(archive):
             contend = input("Enter the contend: ")
             with open(archive , "r") as file:
                 file_contend = file.read()
-                file_contend += contend
+                file_edit = file_contend + " " + contend
             with open(archive, "w") as filerec:
-                filerec.write(file_contend)
+                filerec.write(file_edit)
     print("Successfully edit!")
 
 def menu():
@@ -81,11 +122,11 @@ def menu():
             case "1":
                 cadNewUser()
             case "2":
-                pass
+                changePermission()
             case "3":
                 pass
             case "4":
-                pass
+                deleteUser()
             case "5":
                 contend = input("Type name of file: ")
                 contend += ".txt"
@@ -95,15 +136,21 @@ def menu():
                     print("Successfully created!")
             case "6":
                 file_name = input("Type name of file for edit: ")
+                file_name += ".txt"
                 with open(file_name, "r") as file:
-                    if file.read():
-                        print(file.read())
+                    file_contend = file.read()
+                    print(f"This is the contend of the file: {file_contend}")
+                    if file_contend:
                         menuEdit(file_name)
                     else:
                         print("File not exist!")
                         break
             case "7":
-                pass
+                file_name = input("Type name of file for read: ")
+                file_name += ".txt"
+                with open(file_name, "r") as file:
+                    file_contend = file.read()
+                    print(f"This is the contend of the file: {file_contend}")
             case "0":
                 break
 
