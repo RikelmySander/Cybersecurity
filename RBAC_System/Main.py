@@ -15,17 +15,20 @@ def signup():
         if login_attempt:
             password = input("Password: ")
             password = sha256(password.encode('utf-8')).hexdigest()
-            cursor.execute("SELECT senha from user where senha = ?", (password,))
+            cursor.execute("SELECT senha from user where senha = ? AND login = ?", (password,login))
             pass_attempt = cursor.fetchone()
             if pass_attempt:
                 print(f"You are logged!, {login}")
                 break
+            else:
+                print("User not exist!")
+                answer = input("You want to create a new user?? (y/n) ")
+                if answer.upper() == "Y" or "YES":
+                    cadNewUser()
+                else:
+                    break
         else:
-            print("User not exist!")
-            answer = input("You want to create a new user?? (y/n) ")
-            if answer.upper() == "Y" or "YES":
-                cadNewUser()
-            break
+            print("Incorrect login, Try again!")
     #I can't get back
     return login
 
@@ -106,7 +109,7 @@ def menuEdit(archive):
                 filerec.write(file_edit)
     print("Successfully edit!")
 
-def menu():
+def menu(login):
     while True:
         print("-"*20)
         print("MENU")
@@ -121,33 +124,46 @@ def menu():
         print("0 - Exit")
         print("-" * 20)
         option = input("Select an option: ")
+        cursor.execute("SELECT idrole FROM user WHERE login = ?", (login,))
+        idrole = cursor.fetchone()
+        idrole = idrole[0]
         match option :
             case "1":
-                cadNewUser()
+                if idrole == 1: cadNewUser()
+                else: print("You not allowed!")
             case "2":
-                changePermission()
+                if idrole == 1: changePermission()
+                else: print("You not allowed!")
             case "3":
-                removePermission()
+                if idrole == 1: removePermission()
+                else: print("You are not allowed!")
             case "4":
-                deleteUser()
+                if idrole == 1: deleteUser()
+                else: print("You not allowed!")
             case "5":
-                contend = input("Type name of file: ")
-                contend += ".txt"
-                with open(contend, "w") as file:
-                    contend = input("Write the contents of the file: ")
-                    file.write(contend)
-                    print("Successfully created!")
+                if idrole == 1 or 2:
+                    contend = input("Type name of file: ")
+                    contend += ".txt"
+                    with open(contend, "w") as file:
+                        contend = input("Write the contents of the file: ")
+                        file.write(contend)
+                        print("Successfully created!")
+                else:
+                    print("You are not allowed!")
             case "6":
-                file_name = input("Type name of file for edit: ")
-                file_name += ".txt"
-                with open(file_name, "r") as file:
-                    file_contend = file.read()
-                    print(f"This is the contend of the file: {file_contend}")
-                    if file_contend:
-                        menuEdit(file_name)
-                    else:
-                        print("File not exist!")
-                        break
+                if idrole == 1 or 2:
+                    file_name = input("Type name of file for edit: ")
+                    file_name += ".txt"
+                    with open(file_name, "r") as file:
+                        file_contend = file.read()
+                        print(f"This is the contend of the file: {file_contend}")
+                        if file_contend:
+                            menuEdit(file_name)
+                        else:
+                            print("File not exist!")
+                            break
+                else:
+                    print("You are not allowed!")
             case "7":
                 file_name = input("Type name of file for read: ")
                 file_name += ".txt"
@@ -157,7 +173,11 @@ def menu():
             case "0":
                 break
 
-menu()
+def main():
+    login = signup()
+    menu(login)
+
+main()
 
 conn.close()
 quit()
